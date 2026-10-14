@@ -1,0 +1,59 @@
+# Environment and local configuration
+.env
+.env.*
+.venv/
+venv/
+env/
+!.env.example
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Databases and runtime files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*-shm
+*-wal
+
+# Logs
+*.log
+
+# User uploads
+uploads/*
+!uploads/.gitkeep
+
+# SSL certificates and keys
+cert/
+*.pem
+*.key
+*.crt
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+
+# Operating systems
+.DS_Store
+Thumbs.db
+
+#Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+#Build and packagging
+*.egg-info/
+build/
+dist/
+
+#Backups
+*.bak*
+
+# Operating systems
+desktop.ini
