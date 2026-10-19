@@ -6,7 +6,7 @@ readme = "README.md"
 license = "AGPL-3.0-or-later"
 license-files = ["LICENSE"]
 authors = [
-    { name = "0xBober", email = "michal.bobrowski.it@protonmail.com" }
+    { name = "0xBober", email = "184147317+0xBober@users.noreply.github.com" }
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -20,8 +20,7 @@ dependencies = [
     "uvicorn>=0.54.0",
 ]
 
-[project.scripts]
-date-jar = "date_jar:main"
+
 
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14.0"]
