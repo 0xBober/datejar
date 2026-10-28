@@ -3,6 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from datejar import models  # noqa: F401  (import registers tables on Base.metadata)
 from datejar.config import settings
 from datejar.db import Base
 
