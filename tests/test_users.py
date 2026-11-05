@@ -10,13 +10,16 @@ from datejar.services.users import (
     MAX_USERNAME_LEN,
     MIN_PASSWORD_LEN,
     MIN_USERNAME_LEN,
+    UsernameDoesNotExistError,
     UsernameTakenError,
     create_user,
+    set_password,
 )
 
 TEST_USERNAME = "MIKE"
 TEST_DISPLAY_NAME = "Michał"
 TEST_PASSWORD = "ReallyHardPassword123"
+TEST_PASSWORD_2 = "NotAsHardPassword321"
 
 
 @pytest.fixture
@@ -108,3 +111,43 @@ def test_session_still_works_after_username_taken(session):
 
     test_user = create_user(session, "bob", TEST_DISPLAY_NAME, TEST_PASSWORD)
     assert test_user.id is not None
+
+
+def test_set_password_pass_verify(session):
+    user = create_user(session, TEST_USERNAME, TEST_DISPLAY_NAME, TEST_PASSWORD)
+    set_password(session, TEST_USERNAME, TEST_PASSWORD_2)
+    assert (
+        verify_password(password_hash=user.password_hash, password=TEST_PASSWORD_2)
+        is True
+    )
+    assert (
+        verify_password(password_hash=user.password_hash, password=TEST_PASSWORD)
+        is False
+    )
+
+
+def test_set_password_User_Does_Not_Exist_Error(session):
+    with pytest.raises(UsernameDoesNotExistError):
+        set_password(session, TEST_USERNAME, TEST_PASSWORD)
+
+
+def test_set_password_failed_set_password_retains_old_password(session):
+    user = create_user(session, TEST_USERNAME, TEST_DISPLAY_NAME, TEST_PASSWORD)
+    with pytest.raises(ValueError):
+        set_password(session, TEST_USERNAME, TEST_PASSWORD[0 : MIN_PASSWORD_LEN - 1])
+
+    assert (
+        verify_password(password_hash=user.password_hash, password=TEST_PASSWORD)
+        is True
+    )
+
+
+def test_set_password_normalize_login(session):
+    user = create_user(session, TEST_USERNAME.lower(), TEST_DISPLAY_NAME, TEST_PASSWORD)
+    set_password(
+        session=session, username=TEST_USERNAME.upper(), new_password=TEST_PASSWORD_2
+    )
+    assert (
+        verify_password(password_hash=user.password_hash, password=TEST_PASSWORD_2)
+        is True
+    )

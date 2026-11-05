@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -18,6 +19,12 @@ class UsernameTakenError(Exception):
     """
 
 
+class UsernameDoesNotExistError(Exception):
+    """
+    Raised when querying a username to the database and nothing is returned
+    """
+
+
 def normalize_username(username: str) -> str:
     username = username.strip().lower()
 
@@ -33,6 +40,13 @@ def normalize_username(username: str) -> str:
     return username
 
 
+def validate_password(password: str) -> None:
+    if not MIN_PASSWORD_LEN <= len(password) <= MAX_PASSWORD_LEN:
+        raise ValueError(
+            f"Password must fit between {MIN_PASSWORD_LEN} and {MAX_PASSWORD_LEN} characters"
+        )
+
+
 def create_user(
     session: Session, username: str, display_name: str, password: str
 ) -> User:
@@ -45,10 +59,7 @@ def create_user(
             f"Display name is empty or longer than {MAX_DISPLAY_NAME_LEN} characters long"
         )
 
-    if not MIN_PASSWORD_LEN <= len(password) <= MAX_PASSWORD_LEN:
-        raise ValueError(
-            f"Password must fit between {MIN_PASSWORD_LEN} and {MAX_PASSWORD_LEN} characters"
-        )
+    validate_password(password=password)
 
     user = User(
         username=username,
@@ -65,3 +76,21 @@ def create_user(
         raise UsernameTakenError(f"Username {username} already exists") from err
 
     return user
+
+
+def set_password(session: Session, username: str, new_password: str) -> None:
+    username = normalize_username(username=username)
+    validate_password(password=new_password)
+
+    find_user_query = select(User).where(User.username == username)
+    result = session.execute(find_user_query)
+
+    user = result.scalar()
+    if user is None:
+        raise UsernameDoesNotExistError(
+            f"Username '{username}' does not exist in database"
+        )
+
+    user.password_hash = hash_password(password=new_password)
+
+    session.commit()
