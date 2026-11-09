@@ -2,11 +2,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from datejar import (
-    cli,
-    models,  # noqa: F401  (import registers tables on Base.metadata)
-)
-from datejar.db import Base, create_db_engine
+from datejar import cli
 from datejar.models import User
 from datejar.security import verify_password
 
@@ -15,13 +11,14 @@ NEW_TEST_PASSWORD = "NotAsHardPassword321"
 
 
 @pytest.fixture
-def session_factory(monkeypatch):
-    engine = create_db_engine("sqlite://")
-    Base.metadata.create_all(engine)
+def session_factory(monkeypatch, engine):
+    """Session factory for the in-memory engine.
+
+    Also patches datejar.cli.SessionLocal, so CLI commands use the test database.
+    """
     factory = sessionmaker(engine)
     monkeypatch.setattr("datejar.cli.SessionLocal", factory)
-    yield factory
-    engine.dispose()
+    return factory
 
 
 def fake_prompts(monkeypatch, display_name, passwords):
