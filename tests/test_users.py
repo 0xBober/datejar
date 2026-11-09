@@ -1,8 +1,5 @@
 import pytest
-from sqlalchemy.orm import Session
 
-from datejar import models  # noqa: F401 user model is needed to run test
-from datejar.db import Base, create_db_engine
 from datejar.security import verify_password
 from datejar.services.users import (
     MAX_DISPLAY_NAME_LEN,
@@ -20,16 +17,6 @@ TEST_USERNAME = "MIKE"
 TEST_DISPLAY_NAME = "Michał"
 TEST_PASSWORD = "ReallyHardPassword123"
 TEST_PASSWORD_2 = "NotAsHardPassword321"
-
-
-@pytest.fixture
-def session():
-    engine = create_db_engine("sqlite://")
-    Base.metadata.create_all(engine)
-    db_session = Session(engine)
-    yield db_session
-    db_session.close()
-    engine.dispose()
 
 
 def test_create_user_normalizes_username(session):
