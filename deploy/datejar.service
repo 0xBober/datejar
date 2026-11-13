@@ -1,0 +1,22 @@
+[Unit]
+Description=DateJar web app
+After=network.target
+
+[Service]
+User=datejar
+Group=datejar
+WorkingDirectory=/opt/datejar
+ExecStart=/opt/datejar/.venv/bin/uvicorn datejar.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5s
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/datejar
+ProtectHome=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
