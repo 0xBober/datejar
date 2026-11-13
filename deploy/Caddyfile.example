@@ -1,0 +1,9 @@
+datejar.<your-tailnet>.ts.net {
+        bind 127.0.0.1 <tailscale-ipv4> <tailscale-ipv6>
+        reverse_proxy localhost:8000
+        header {
+                X-Frame-Options DENY
+                X-Content-Type-Options nosniff
+                Referrer-Policy same-origin
+        }
+}
